@@ -1,0 +1,51 @@
+
+# find out whether given s could be broken into exactly TWO words in wordDict and list it out
+def findTwoWords(s, wordDict):
+    for i in range(len(s)):
+        if s[:i+1] in wordDict and s[i+1:] in wordDict:
+            return s[:i+1] + " " + s[i+1:] 
+    return ""
+
+# find out whether given s could be broken into Any words combinations in wordDict
+def findIsWordBreak(s, wordDict):
+    dp = [False] * (len(s)+1)
+    dp[0] = True
+    for i in range (len(s)):
+        for j in range (i, len(s)):
+            if dp[i] and s[i:j+1] in wordDict: 
+                dp[j+1] = True                 
+    return dp[-1]
+
+# find out whether given s could be broken into Any words combinations in wordDict and list ONE of them
+def findWordBreakSingle(s, wordDict):
+    dp = ["" for _ in range(len(s))] + ["#"]
+    for i in range(len(s)-1,-1,-1):
+        for j in range(i, len(s)):
+            if s[i:j+1] in wordDict and dp[j+1] != "":
+                if dp[j+1] == "#":
+                    dp[i] = s[i:j+1]
+                else:
+                    dp[i] = s[i:j+1] + " " + dp[j+1]
+    return dp[0]
+
+# find out whether given s could be broken into Any words combinations in wordDict and list ALL of them
+def findWordBreakAll(s, wordDict):
+    dp = {len(s): [""]}
+    for i in range (len(s)-1, -1, -1):
+        values = []
+        for j in range (i+1, len(s)+1):
+            if s[i:j] in wordDict:
+                for word in dp[j]:
+                    if word:
+                        values.append(s[i:j] + " " + word)
+                    else:
+                        values.append(s[i:j])
+        dp[i] = values
+    return dp[0]
+
+s = "whitepages"
+wordDict = ["white","epag","es","whi","te","pag","whitepa","w","hitepages","whitepage","s"]
+print(findTwoWords(s, wordDict))
+print(findIsWordBreak(s, wordDict))
+print(findWordBreakSingle(s, wordDict))
+print(findWordBreakAll(s, wordDict))
