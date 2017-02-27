@@ -1,0 +1,149 @@
+#####################################################################
+"""
+        Walls and Gates
+"""
+
+# Walls and Gates
+# Find shortest way and mark its distance from any non-wall(-1) room(inf,or 1000) to any gate(0)
+
+# Main function
+def findPath(puzzle):
+    for i in range (len(puzzle)):
+        for j in range (len(puzzle[0])):
+            if puzzle[i][j] == 0:
+                #dfs(i,j,puzzle,0)
+                bfs(i,j,puzzle)
+    return puzzle
+
+# DFS solution
+def dfs(i,j,puzzle,dis):
+    if i<0 or i>=len(puzzle) or j<0 or j>=len(puzzle[0]) or puzzle[i][j]<dis:
+        return
+    puzzle[i][j] = dis
+    dfs(i+1,j,puzzle,dis+1)
+    dfs(i,j+1,puzzle,dis+1)
+    dfs(i-1,j,puzzle,dis+15)
+    dfs(i,j-1,puzzle,dis+1)
+    return
+
+# BFS solution
+def bfs(i,j,puzzle):
+    stack = [(i+1,j,1),(i-1,j,1),(i,j+1,1),(i,j-1,1)]
+    while stack:
+        nextI, nextJ, dis = stack.pop(0)
+        if 0<=nextI<len(puzzle) and 0<=nextJ<len(puzzle[0]) and puzzle[nextI][nextJ] > dis:
+            puzzle[nextI][nextJ] = dis
+            stack.append((nextI+1,nextJ,dis+1))
+            stack.append((nextI-1,nextJ,dis+1))
+            stack.append((nextI,nextJ+1,dis+1))
+            stack.append((nextI,nextJ-1,dis+1))
+    return
+
+"""
+
+
+puzzle = [[1000,-1,0,1000],
+          [1000,1000,1000,-1],
+          [1000,-1,1000,-1],
+          [0,-1,1000,1000]]
+print(findPath(puzzle))
+
+
+"""
+
+#####################################################################
+"""
+         Puzzle Walker
+"""
+
+# Puzzle Walker
+# find the shorest distance from the start('S') to the end('E') and mark it down (one of the solution)
+
+# Main function
+def findWayToEnd(puzzle):
+    for i in range (len(puzzle)):
+        for j in range (len(puzzle[0])):
+            if puzzle[i][j] == 'S':
+                dis, path = bfsShortest(i,j,puzzle)
+    for point in path[1:len(path)-1]:
+        puzzle[point[0]][point[1]] = 'P'
+    return puzzle, dis
+
+# BFS solution
+def bfsShortest(i,j,puzzle):
+    stack = [(i+1,j,1),(i-1,j,1),(i,j+1,1),(i,j-1,1)]
+    visited = [[i,j]]
+    pathDict = {0:[[[i,j]]]}
+    while stack:
+        nextI, nextJ, dis = stack.pop(0)
+        if 0<=nextI<len(puzzle) and 0<=nextJ<len(puzzle[0]) and puzzle[nextI][nextJ] != 'X' and [nextI,nextJ] not in visited:
+            visited.append([nextI,nextJ])
+            for prevPath in pathDict[dis-1]:
+                if prevPath[-1][0] == nextI or prevPath[-1][1] == nextJ:
+                    newPath = prevPath[:]
+                    newPath.append([nextI,nextJ])
+                    if dis not in pathDict.keys():
+                        pathDict[dis] = [newPath]
+                    else:
+                        pathDict[dis].append(newPath)
+                    if puzzle[nextI][nextJ] == 'E':
+                        return (dis, newPath)
+            stack.append((nextI+1,nextJ,dis+1))
+            stack.append((nextI-1,nextJ,dis+1))
+            stack.append((nextI,nextJ+1,dis+1))
+            stack.append((nextI,nextJ-1,dis+1))
+    return -1
+
+"""
+
+puzzle1 = [['1','X','S','1'],
+          ['1','1','1','1'],
+          ['1','1','1','1'],
+          ['1','E','1','1']]
+print(findWayToEnd(puzzle1))
+
+
+
+"""
+#####################################################################
+"""
+        Number of Islands
+"""
+
+# Number of Islands
+# Find how many land(1) islands seperated by water(0), all adjancent 1 count as single island
+
+# Main function
+def numIslands(grid):
+    island = 0
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            island += sinkIsland(i,j)
+    return island
+
+# DFS solution
+def sinkIsland(i,j):
+    if (0<=i<len(grid) and 0<=j<len(grid[0])):
+        if grid[i][j]=='1':
+            grid[i][j] = '0'
+            sinkIsland(i+1,j)
+            sinkIsland(i,j+1)
+            sinkIsland(i-1,j)
+            sinkIsland(i,j-1)
+            return 1
+        else:
+            return 0
+    else:
+        return 0
+
+"""
+
+grid = ["11110",
+        "11010",
+        "11000",
+        "00000"]
+print(numIslands(grid))
+
+
+"""
+#####################################################################
